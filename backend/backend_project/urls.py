@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
-from api.views import DiaryView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/diary/', DiaryView.as_view(), name='diary'),
+    path("admin/", admin.site.urls),
+
+    path("api/users/", include("users.urls")),  # ⭐ NEW user auth routes
+    path("api/", include("api.urls")),  
+    path("api/auth/", include("accounts.urls")),  # ⭐ NEW auth routes
 ]
