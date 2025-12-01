@@ -344,7 +344,10 @@ export default function LandingPage() {
       </section>
 
       {/* 🌿 Reviews Section */}
-      <section id="reviews" className="relative bg-linear-to-b from-[#E8F9F0] via-[#F9F9FF] to-[#FFF9F3] py-24 px-6 text-center overflow-hidden">
+      <section
+        id="reviews"
+        className="relative bg-linear-to-b from-[#E8F9F0] via-[#F9F9FF] to-[#FFF9F3] py-24 px-6 text-center overflow-hidden"
+      >
         {/* Floating glow orbs */}
         <div className="absolute top-10 left-10 w-60 h-60 bg-teal-200/30 rounded-full blur-3xl animate-softPulse"></div>
         <div className="absolute bottom-20 right-20 w-72 h-72 bg-emerald-200/40 rounded-full blur-3xl animate-softPulse"></div>
@@ -369,17 +372,17 @@ export default function LandingPage() {
             {
               name: "Emma I.",
               text: "MindHaven changed my perspective on therapy. The AI support helped me take the first step without fear.",
-              img:  Review1 ,
+              img: Review1,
             },
             {
               name: "Jason K.",
               text: "I’ve found my people here. The community is supportive, empathetic, and genuinely kind.",
-              img:  Review2 ,
+              img: Review2,
             },
             {
               name: "Aisha R.",
               text: "Journaling securely and tracking my mood has helped me see my growth every week. So grateful!",
-              img:  Review3 ,
+              img: Review3,
             },
           ].map((review, i) => (
             <div
@@ -417,7 +420,10 @@ export default function LandingPage() {
       </section>
 
       {/* ❓ FAQ Section */}
-      <section id="faq" className="relative py-24 bg-linear-to-t from-[#FFF9F3] via-[#F8FAFC] to-[#E8F9F0] px-8 flex flex-col items-center text-center">
+      <section
+        id="faq"
+        className="relative py-24 bg-linear-to-t from-[#FFF9F3] via-[#F8FAFC] to-[#E8F9F0] px-8 flex flex-col items-center text-center"
+      >
         {/* Background Accent */}
         <div className="absolute top-0 left-0 w-full h-full bg-linear-to-b from-transparent via-white/40 to-white/60 backdrop-blur-sm z-0"></div>
 
