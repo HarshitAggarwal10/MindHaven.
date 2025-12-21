@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import CalmDecor from "../CalmDecor";
 
 export default function MeditationSection() {
   return (
@@ -12,7 +11,6 @@ export default function MeditationSection() {
             <h2 className="text-2xl font-semibold text-gray-800">Meditation</h2>
             <p className="text-gray-500 mt-1">Guided meditations, breathwork, and calming playlists.</p>
           </div>
-          <CalmDecor className="w-44 h-24" />
         </div>
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">

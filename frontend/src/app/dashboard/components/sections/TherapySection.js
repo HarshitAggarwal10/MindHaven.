@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import CalmDecor from "../CalmDecor";
 
 export default function TherapySection() {
   return (
@@ -12,7 +11,6 @@ export default function TherapySection() {
             <h2 className="text-2xl font-semibold text-gray-800">Therapy & Appointments</h2>
             <p className="text-gray-500 mt-1">Schedule in-person or online sessions with certified therapists.</p>
           </div>
-          <CalmDecor className="w-44 h-24" />
         </div>
 
         <div className="mt-6">

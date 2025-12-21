@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv 
+from corsheaders.defaults import default_headers
 
 load_dotenv()  # loads .env
 
@@ -25,12 +26,17 @@ INSTALLED_APPS = [
     "corsheaders",
     "accounts",
     "users",
+    "diary",
 ]
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+MIGRATION_MODULES = {
+    "users": None
 }
 
 REST_FRAMEWORK = {
@@ -93,3 +99,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-anon-token",
+]

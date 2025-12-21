@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import CalmDecor from "../CalmDecor";
 import { useState } from "react";
 
 const MOODS = [
@@ -23,7 +22,6 @@ export default function MoodSection() {
             <h2 className="text-2xl font-semibold text-gray-800">Mood Tracker</h2>
             <p className="text-gray-500 mt-1">Quick check-in — track patterns over time.</p>
           </div>
-          <CalmDecor className="w-44 h-24" />
         </div>
 
         <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-3">

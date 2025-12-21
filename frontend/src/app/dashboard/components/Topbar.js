@@ -64,7 +64,7 @@ export default function Topbar({ user }) {
     <header className="relative z-999 px-6 py-4 flex items-center justify-between overflow-visible">
       {/* 🌈 Animated Pastel Background */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
-        <div className="absolute inset-0 bg-linear-to-r from-[#F8FFFE] via-[#ECFDF9] to-[#FFF9EA] animate-pulse-slow" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#F8FFFE] via-[#ECFDF9] to-[#FFF9EA]" />
 
         {/* Floating icons */}
         <Brain className="absolute top-3 left-16 w-10 h-10 text-teal-300 opacity-30 animate-floating-slow" />
@@ -72,7 +72,7 @@ export default function Topbar({ user }) {
         <Heart className="absolute top-10 right-10 w-8 h-8 text-rose-300 opacity-30 animate-floating-slow" />
       </div>
 
-      {/* 🌿 Rotating Quote */}
+      {/* 🌿 Rotating Quote and bring it in center */}
       <div className="flex items-center">
         <AnimatePresence mode="wait">
           <motion.div
