@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv # type: ignore
+from datetime import timedelta
+from dotenv import load_dotenv 
 
 load_dotenv()  # loads .env
 
@@ -9,6 +10,8 @@ FIREBASE_CREDENTIALS_JSON = os.path.join(BASE_DIR, "firebase_service_account.jso
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 ALLOWED_HOSTS = ["*"]
+AUTH_USER_MODEL = "users.User"
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -20,7 +23,21 @@ INSTALLED_APPS = [
     "rest_framework",
     "api",
     "corsheaders",
+    "accounts",
+    "users",
 ]
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

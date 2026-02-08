@@ -35,7 +35,7 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
 
   // Hide Navbar and Footer on login/signup page
-  const hideNavAndFooter = pathname === "/login";
+  const hideNavAndFooter = pathname === "/login" || pathname === "/signup";
 
   return (
     <html

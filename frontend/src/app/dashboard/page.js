@@ -1,54 +1,91 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { auth } from "../../firebase/client";
-import { signOut, onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Brain, BookHeart, Users, SmilePlus, LogOut } from "lucide-react";
 
-export default function DashboardPage() {
-  const [user, setUser] = useState(null);
+export default function Dashboard() {
   const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [tab, setTab] = useState("overview");
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      if (!u) router.push("/login");
-      else setUser(u);
-    });
-    return () => unsub();
+    async function fetchUser() {
+      const res = await fetch("/api/auth/me");
+      const data = await res.json();
+      if (!data.user) return router.push("/login");
+      setUser(data.user);
+    }
+    fetchUser();
   }, [router]);
 
-  const features = [
-    { name: "Digital Diary", path: "/diary" },
-    { name: "AI Mood Tracker", path: "/mood" },
-    { name: "Community", path: "/community" },
-    { name: "Therapy Appointments", path: "/appointments" },
-    { name: "Wellness Camps", path: "/camps" },
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+  }
+
+  const tabs = [
+    { id: "overview", label: "Overview", icon: Brain },
+    { id: "journal", label: "Journal", icon: BookHeart },
+    { id: "community", label: "Community", icon: Users },
+    { id: "mood", label: "Mood Tracker", icon: SmilePlus },
   ];
 
   return (
-    <div className="p-10 text-center">
-      <h1 className="text-3xl font-bold mb-4">
-        Welcome, {user?.email?.split("@")[0]}
-      </h1>
-      <p className="text-gray-600 mb-8">Choose where you'd like to go:</p>
+    <div className="min-h-screen relative bg-linear-to-br from-[#E8F9FF] via-[#FFF9F4] to-[#E8FDF6] font-[Poppins]">
 
-      <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        {features.map((f) => (
+      {/* Background Orbs */}
+      <div className="absolute w-80 h-80 bg-teal-300/30 blur-3xl rounded-full top-20 left-20 animate-pulse-slow"></div>
+      <div className="absolute w-96 h-96 bg-emerald-200/30 blur-3xl rounded-full bottom-10 right-10 animate-pulse-slower"></div>
+
+      <div className="relative z-10 max-w-5xl mx-auto pt-24">
+
+        <h1 className="text-4xl font-[Playfair_Display] text-gray-800 font-bold">
+          Welcome back, {user?.name || "Friend"} 🌿
+        </h1>
+
+        {/* Tabs */}
+        <div className="flex gap-4 mt-10">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
+                tab === t.id
+                  ? "bg-teal-500 text-white shadow-lg"
+                  : "bg-white/60 backdrop-blur border-gray-200 text-gray-700 hover:scale-105"
+              }`}
+            >
+              <t.icon size={18} /> {t.label}
+            </button>
+          ))}
+
           <button
-            key={f.name}
-            onClick={() => router.push(f.path)}
-            className="border border-gray-300 rounded-xl p-6 bg-white shadow hover:shadow-md hover:-translate-y-1 transition"
+            onClick={logout}
+            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/80 text-white hover:bg-red-600 transition"
           >
-            {f.name}
+            <LogOut size={18} /> Logout
           </button>
-        ))}
-      </div>
+        </div>
 
-      <button
-        onClick={() => signOut(auth)}
-        className="mt-10 text-red-500 underline"
-      >
-        Log Out
-      </button>
+        {/* TAB CONTENT */}
+        <div className="mt-10 p-6 bg-white/70 backdrop-blur-lg border border-white/50 rounded-3xl shadow-xl">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tab}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -40 }}
+              transition={{ duration: 0.4 }}
+            >
+              {tab === "overview" && <p>Your personalized wellness overview 💚</p>}
+              {tab === "journal" && <p>Start writing your thoughts ✍️</p>}
+              {tab === "community" && <p>Connect with people who care 🤝</p>}
+              {tab === "mood" && <p>Track your emotional growth 📈</p>}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 }
