@@ -34,13 +34,14 @@ const inter = Inter({
 export default function RootLayout({ children }) {
   const pathname = usePathname();
 
-  // Hide Navbar and Footer on login/signup page
-  const hideNavAndFooter = pathname === "/login" || pathname === "/signup";
+  // Hide Navbar and Footer on login/signup/dashboard pages
+  const hideNavAndFooter = pathname === "/login" || pathname === "/signup" || pathname === "/dashboard";
+  const fonts = `${poppins.className} ${quicksand.className} ${inter.className} ${playfair.className}`;
 
   return (
     <html
       lang="en"
-      className={`${poppins.className} ${quicksand.className} ${inter.className} ${playfair.className}`}
+      className={fonts}
     >
       <body className="bg-[#F8FAFC] text-gray-800 antialiased overflow-x-hidden">
         {!hideNavAndFooter && <Navbar />}

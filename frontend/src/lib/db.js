@@ -1,3 +1,4 @@
+
 // src/lib/db.js
 import { Pool } from "pg";
 
@@ -11,5 +12,16 @@ if (!global.__pgPool) {
 } else {
   pool = global.__pgPool;
 }
+
+import pkg from "pg";
+const { Pool } = pkg;
+
+const pool = new Pool({
+  host: process.env.PGHOST,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  port: process.env.PGPORT,
+});
 
 export default pool;
