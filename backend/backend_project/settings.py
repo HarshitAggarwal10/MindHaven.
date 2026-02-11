@@ -1,11 +1,8 @@
 import os
 from pathlib import Path
 from datetime import timedelta
-from dotenv import load_dotenv 
-<<<<<<< HEAD
-=======
 from corsheaders.defaults import default_headers
->>>>>>> 30c3065ea6832ff6649924cec74bd1d78f58eff5
+from dotenv import load_dotenv 
 
 load_dotenv()  # loads .env
 
@@ -29,10 +26,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "accounts",
     "users",
-<<<<<<< HEAD
-=======
     "diary",
->>>>>>> 30c3065ea6832ff6649924cec74bd1d78f58eff5
 ]
 
 SIMPLE_JWT = {
@@ -41,13 +35,6 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-<<<<<<< HEAD
-=======
-MIGRATION_MODULES = {
-    "users": None
-}
-
->>>>>>> 30c3065ea6832ff6649924cec74bd1d78f58eff5
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",

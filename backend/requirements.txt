@@ -5,9 +5,7 @@ psycopg[binary]==3.2.12
 django-cors-headers==3.14.0
 python-dotenv
 cryptography
-<<<<<<< HEAD
-=======
 pyjwt==2.6.0
 firebase-admin==6.0.1
 pycryptodome==3.19.0
->>>>>>> 30c3065ea6832ff6649924cec74bd1d78f58eff5
+

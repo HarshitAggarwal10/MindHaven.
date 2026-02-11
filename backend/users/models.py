@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-from django.contrib.auth.models import AbstractUser
-from django.db import models
-
-class User(AbstractUser):
-    created_at = models.DateTimeField(auto_now_add=True)
-=======
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 
@@ -40,4 +33,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = "users"   # 🔥 IMPORTANT
->>>>>>> 30c3065ea6832ff6649924cec74bd1d78f58eff5
