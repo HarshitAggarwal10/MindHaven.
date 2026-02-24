@@ -35,6 +35,7 @@ export default function DiarySection() {
   // ================= UI =================
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  
 
   function toastMsg(type, msg) {
     setToast({ type, msg });
@@ -81,6 +82,22 @@ export default function DiarySection() {
     setLockState("UNLOCKED");
   }
 
+  async function fetchDiaries() {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/diary/list/", {
+      headers: {
+        "X-ANON-TOKEN": anonToken,
+      },
+    });
+
+    const data = await res.json();
+    console.log("Fetched diaries:", data);
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
   // ================= SAVE ENTRY =================
   async function handleSave() {
     const entered = prompt("Confirm PIN to save & lock diary");
@@ -89,30 +106,38 @@ export default function DiarySection() {
       return;
     }
 
-    const encTitle = encrypt(title, entered);
-    const encContent = encrypt(editorHtml, entered);
+    if (!title.trim() && !editorHtml.trim()) {
+      toastMsg("error", "Diary cannot be empty");
+      return;
+    }
 
     try {
-      const res = await fetch(`${API}/diary/`, {
+      const encryptedContent = encrypt(editorHtml || " ", entered);
+
+      const payload = {
+        title: btoa(title || "Untitled"),
+        content_encrypted: btoa(encryptedContent),
+      };
+
+      console.log("Sending:", payload);
+
+      const res = await fetch("http://127.0.0.1:8000/api/diary/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-ANON-TOKEN": anonToken,
         },
-        body: JSON.stringify({
-          title: encTitle.data,
-          content_encrypted: encContent.data,
-          iv: encContent.iv,
-          tag: encContent.tag,
-        }),
+        body: JSON.stringify(payload),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Save failed");
+        console.error(data);
+        throw new Error(data.error || "Save failed");
       }
 
-      toastMsg("success", "Diary saved & locked 🔒");
+      toastMsg("success", "Diary saved successfully 🔒");
       setTitle("");
       setEditorHtml("");
       setLockState("LOCKED");
