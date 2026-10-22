@@ -15,6 +15,7 @@ AUTH_USER_MODEL = "users.User"
 
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -22,11 +23,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "api",
     "corsheaders",
+    "channels",
+    "api",
     "accounts",
     "users",
     "diary",
+    "community",
 ]
 
 SIMPLE_JWT = {
@@ -73,16 +76,26 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend_project.wsgi.application"
 
 # Database config
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "mindhaven"),
-        "USER": os.getenv("DB_USER", "mindhaven"),
-        "PASSWORD": os.getenv("DB_PASS", "mindhavenpass"),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
+USE_SQLITE = os.getenv("USE_SQLITE", "true").lower() == "true"
+
+if USE_SQLITE:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "mindhaven"),
+            "USER": os.getenv("DB_USER", "mindhaven"),
+            "PASSWORD": os.getenv("DB_PASS", "mindhavenpass"),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
+    }
 
 # Load Fernet key
 FERNET_KEY = os.getenv("FERNET_KEY")
@@ -90,6 +103,24 @@ FERNET_KEY = os.getenv("FERNET_KEY")
 # Static files
 STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+ASGI_APPLICATION = "backend_project.asgi.application"
+REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
+if DEBUG:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [REDIS_URL],
+            },
+        },
+    }
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -98,4 +129,10 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "x-anon-token",
+    "x-diary-password",
+    "x-diary-email",
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
 ]

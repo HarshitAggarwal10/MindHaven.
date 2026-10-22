@@ -13,6 +13,16 @@ class AnonymousDiaryUser(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class AnonymousUserProfile(models.Model):
+    firebase_uid = models.CharField(max_length=255, unique=True)
+    display_handle = models.CharField(max_length=100)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.display_handle
+
+
 class DiaryEntry(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

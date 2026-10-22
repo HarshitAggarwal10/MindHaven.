@@ -1,42 +1,28 @@
-import uuid
+from django.conf import settings
 from django.db import models
-
-class DiaryUser(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
-
-    anon_id = models.CharField(max_length=12, unique=True)
-    pin_hash = models.TextField()
-    anon_token = models.CharField(max_length=128, unique=True, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = "diary_users"
-        managed = False   # VERY IMPORTANT
-
-    def __str__(self):
-        return f"DiaryUser-{self.anon_id}"
 
 
 class DiaryEntry(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    diary_user = models.ForeignKey(
-        DiaryUser,
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="entries",
-        db_column="diary_user_id",  # 🔥 matches DB
+        related_name="diary_entries",
     )
-
-    title = models.BinaryField()
-    content_encrypted = models.BinaryField()
-    iv = models.BinaryField()
-    tag = models.BinaryField()
-
+    title = models.TextField(blank=True, default="")
+    content = models.TextField(blank=True, default="")
+    encrypted_content = models.TextField(blank=True, default="")
+    encrypted_key = models.TextField(blank=True, default="")
+    key_nonce = models.TextField(blank=True, default="")
+    content_nonce = models.TextField(blank=True, default="")
+    salt = models.TextField(blank=True, default="")
+    favorite = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "diary_entries"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"DiaryEntry-{self.id}"

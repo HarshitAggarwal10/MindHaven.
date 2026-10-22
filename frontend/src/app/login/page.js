@@ -12,21 +12,44 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
+    if (isSubmitting) return;
     setError("");
+    setIsSubmitting(true);
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/login/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
-    if (!res.ok) return setError(data.error || "Invalid email or password");
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.detail || data.error || "Invalid email or password");
+        return;
+      }
 
-    router.push("/dashboard");
+      if (!data.access) {
+        setError("Login response was incomplete. Please try again.");
+        return;
+      }
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("mh_token", data.access);
+        localStorage.setItem("mh_user", JSON.stringify({ email: email.trim().toLowerCase() }));
+      }
+
+      router.push("/dashboard");
+    } catch (requestError) {
+      console.error("Login request failed:", requestError);
+      setError("Could not reach the server. Check that the backend is running, then try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -83,8 +106,12 @@ export default function LoginPage() {
           </div>
 
           {/* Login Button */}
-          <button className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-teal-400 to-emerald-500 text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-all">
-            <LogIn size={18} /> Sign In
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-teal-400 to-emerald-500 text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-wait"
+          >
+            <LogIn size={18} /> {isSubmitting ? "Signing in..." : "Sign In"}
           </button>
         </form>
 

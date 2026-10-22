@@ -12,21 +12,51 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [hasExistingAccount, setHasExistingAccount] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSignup(e) {
     e.preventDefault();
+    if (isSubmitting) return;
     setError("");
+    setHasExistingAccount(false);
+    setIsSubmitting(true);
 
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/signup/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ display_name: name, email, password }),
+      });
 
-    const data = await res.json();
-    if (!res.ok) return setError(data.error || "Signup failed");
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 409) {
+          setHasExistingAccount(true);
+          setError("This email is already registered. Sign in with the original password, or use another email.");
+        } else {
+          setError(data.error || data.detail || "Signup failed");
+        }
+        return;
+      }
 
-    router.push("/dashboard");
+      if (!data.access) {
+        setError("Account response was incomplete. Please try signing in.");
+        return;
+      }
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("mh_token", data.access);
+        localStorage.setItem("mh_user", JSON.stringify({ email: email.trim().toLowerCase() }));
+      }
+
+      router.push("/dashboard");
+    } catch (requestError) {
+      console.error("Signup request failed:", requestError);
+      setError("Could not reach the server. Check that the backend is running, then try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -48,8 +78,13 @@ export default function SignupPage() {
         </p>
 
         {error && (
-          <div className="bg-red-100 text-red-600 text-sm p-2 rounded-lg mb-4 text-center">
-            {error}
+          <div className="bg-red-100 text-red-600 text-sm p-3 rounded-lg mb-4 text-center">
+            <p>{error}</p>
+            {hasExistingAccount && (
+              <Link href="/login" className="inline-block mt-2 font-semibold text-teal-700 hover:underline">
+                Go to sign in
+              </Link>
+            )}
           </div>
         )}
 
@@ -90,8 +125,12 @@ export default function SignupPage() {
             />
           </div>
 
-          <button className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-emerald-400 to-teal-500 text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-all">
-            <UserPlus size={18} /> Sign Up
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-emerald-400 to-teal-500 text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-wait"
+          >
+            <UserPlus size={18} /> {isSubmitting ? "Creating account..." : "Sign Up"}
           </button>
         </form>
 

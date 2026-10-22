@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .auth import verify_firebase_token
+from django.contrib.auth import authenticate
+from rest_framework.decorators import api_view
 from .models import AnonymousUserProfile, DiaryEntry
 from .serializers import DiaryCreateSerializer
 
@@ -46,3 +48,19 @@ class DiaryView(APIView):
             return Response({"detail": "Invalid token"}, status=401)
 
         return Response([])
+
+
+@api_view(["POST"])
+def verify_user_credentials(request):
+    email = request.data.get("email")
+    password = request.data.get("password")
+
+    if not email or not password:
+        return Response({"error": "Email and password required"}, status=400)
+
+    user = authenticate(request, email=email, password=password)
+
+    if not user:
+        return Response({"error": "Invalid credentials"}, status=401)
+
+    return Response({"message": "Verified"}, status=200)

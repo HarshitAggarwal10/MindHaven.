@@ -9,9 +9,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "password", "full_name", "username"]
+        fields = ["id", "email", "password", "full_name"]
         extra_kwargs = {
-            "username": {"required": False},
             "email": {"required": True},
         }
 
@@ -24,12 +23,10 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         full_name = validated_data.pop("full_name", "")
         email = validated_data.get("email")
-        username = email.split("@")[0]
 
         user = User.objects.create_user(
-            username=username,
             email=email,
-            password=validated_data["password"]
+            password=validated_data["password"],
         )
 
         if full_name:
@@ -45,4 +42,4 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email", "username", "first_name", "last_name"]
+        fields = ["id", "email", "first_name", "last_name"]

@@ -2,6 +2,7 @@ from django.urls import path, include
 # from .views_diary import diary_view
 # from .views_diary_auth import diary_anon_create
 from .views_auth import signup, login
+from .views import verify_user_credentials
 
 urlpatterns = [
     # path("diary/", diary_view),
@@ -9,4 +10,5 @@ urlpatterns = [
     path("auth/signup/", signup),
     path("auth/login/", login),
     path("diary/", include("diary.urls")),
+    path("verify-user/", verify_user_credentials),
 ]
