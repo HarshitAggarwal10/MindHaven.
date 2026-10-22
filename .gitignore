@@ -11,6 +11,11 @@ firebase_service_account.json
 backend/firebase_service_account.json
 frontend/src/firebase/firebaseClient.js
 
+# Python-generated files and local development database
+__pycache__/
+*.py[cod]
+backend/db.sqlite3
+
 # Backup or temporary folders
 backup/
 .vscode/
