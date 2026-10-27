@@ -67,7 +67,11 @@ class CommunityMembership(models.Model):
 
     class Meta:
         unique_together = ("community", "user")
-        indexes = [models.Index(fields=["community", "user"])]
+        indexes = [
+            models.Index(fields=["community", "user"]),
+            models.Index(fields=["community", "is_active"]),
+            models.Index(fields=["user", "is_active"]),
+        ]
 
 
 class CommunityPost(models.Model):
@@ -84,6 +88,7 @@ class CommunityPost(models.Model):
 
     class Meta:
         ordering = ["-is_pinned", "-created_at"]
+        indexes = [models.Index(fields=["community", "is_deleted", "-created_at"])]
 
 
 class PostReaction(models.Model):
@@ -145,6 +150,7 @@ class ChatMessage(models.Model):
 
     class Meta:
         ordering = ["created_at"]
+        indexes = [models.Index(fields=["room", "is_deleted", "-created_at"])]
 
 
 class MessageReaction(models.Model):

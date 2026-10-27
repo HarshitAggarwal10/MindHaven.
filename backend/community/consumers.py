@@ -8,6 +8,7 @@ from .models import (
     ChatRoom,
     CommunityMembership,
     MessageReaction,
+    Notification,
     TypingStatus,
     UserPresence,
 )
@@ -32,12 +33,13 @@ class CommunityChatConsumer(AsyncJsonWebsocketConsumer):
         self.accepted = True
         await self.join_participant()
         await self.update_presence(True)
-        await self.send_json({"type": "presence.update", "online": True})
+        await self.broadcast_presence()
 
     async def disconnect(self, code):
         if getattr(self, "accepted", False):
             await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
             await self.update_presence(False)
+            await self.broadcast_presence()
 
     async def receive_json(self, content):
         event = content.get("type")
@@ -80,6 +82,15 @@ class CommunityChatConsumer(AsyncJsonWebsocketConsumer):
             },
         }
         await self.channel_layer.group_send(self.room_group_name, payload)
+        notifications = await self.create_message_notifications(message)
+        for notification in notifications:
+            await self.channel_layer.group_send(
+                f"user_notifications_{notification['recipient_id']}",
+                {
+                    "type": "notification.created",
+                    "notification": notification["data"],
+                },
+            )
 
     async def handle_reaction(self, content):
         message_id = content.get("message_id")
@@ -167,6 +178,12 @@ class CommunityChatConsumer(AsyncJsonWebsocketConsumer):
     async def chat_typing_updated(self, event):
         await self.send_json(event)
 
+    async def presence_update(self, event):
+        await self.send_json({
+            "type": "presence.update",
+            "online_count": event["online_count"],
+        })
+
     @database_sync_to_async
     def get_room(self):
         try:
@@ -212,6 +229,26 @@ class CommunityChatConsumer(AsyncJsonWebsocketConsumer):
         return presence
 
     @database_sync_to_async
+    def get_online_count(self):
+        room = ChatRoom.objects.get(pk=self.room_id)
+        return UserPresence.objects.filter(
+            room__community=room.community,
+            room__is_private=False,
+            is_online=True,
+            user__community_memberships__community=room.community,
+            user__community_memberships__is_active=True,
+        ).values("user_id").distinct().count()
+
+    async def broadcast_presence(self):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "presence.update",
+                "online_count": await self.get_online_count(),
+            },
+        )
+
+    @database_sync_to_async
     def create_message(self, body, image_url, reply_to_id):
         room = ChatRoom.objects.get(pk=self.room_id)
         reply_to = None
@@ -224,6 +261,37 @@ class CommunityChatConsumer(AsyncJsonWebsocketConsumer):
             image_url=image_url,
             reply_to=reply_to,
         )
+
+    @database_sync_to_async
+    def create_message_notifications(self, message):
+        room = message.room
+        if room.is_private:
+            return []
+
+        recipients = CommunityMembership.objects.filter(
+            community=room.community,
+            is_active=True,
+        ).exclude(user=message.author).values_list("user_id", flat=True)
+        notifications = []
+        for recipient_id in recipients:
+            notification = Notification.objects.create(
+                recipient_id=recipient_id,
+                title=f"New message in {room.community.name}",
+                body="A community member shared a new message. Open the community to join the conversation.",
+                link=f"/community/{room.community.slug}",
+            )
+            notifications.append({
+                "recipient_id": recipient_id,
+                "data": {
+                    "id": notification.pk,
+                    "title": notification.title,
+                    "body": notification.body,
+                    "link": notification.link,
+                    "is_read": notification.is_read,
+                    "created_at": notification.created_at.isoformat(),
+                },
+            })
+        return notifications
 
     @database_sync_to_async
     def toggle_message_reaction(self, message_id, emoji):
@@ -253,3 +321,24 @@ class CommunityChatConsumer(AsyncJsonWebsocketConsumer):
         message.is_deleted = True
         message.save(update_fields=["is_deleted"])
         return True
+
+
+class UserNotificationConsumer(AsyncJsonWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope["user"]
+        if not self.user or not self.user.is_authenticated:
+            return await self.close(code=4401)
+
+        self.notification_group_name = f"user_notifications_{self.user.pk}"
+        await self.channel_layer.group_add(self.notification_group_name, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, code):
+        if hasattr(self, "notification_group_name"):
+            await self.channel_layer.group_discard(self.notification_group_name, self.channel_name)
+
+    async def notification_created(self, event):
+        await self.send_json({
+            "type": "notification.created",
+            "notification": event["notification"],
+        })

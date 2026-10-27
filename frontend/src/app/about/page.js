@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  ArrowRight,
   Heart,
   Shield,
   Brain,
@@ -10,6 +11,7 @@ import {
   Instagram,
   Mail,
   Sparkles,
+  Leaf,
 } from "lucide-react";
 import Harshit from "../../public/landingpage/myimg.jpeg";
 import About from "../../public/landingpage/about.png";
@@ -17,106 +19,98 @@ import Story from "../../public/landingpage/story.png";
 
 export default function AboutPage() {
   return (
-    <div className="bg-linear-to-br from-[#F9FFFB] via-[#FFF8F1] to-[#E8F9FF] min-h-screen font-[Outfit] text-gray-800 relative overflow-hidden">
-      {/* 🌈 Floating Gradient Orbs */}
-      <div className="absolute top-20 left-20 w-64 h-64 bg-teal-300/30 blur-3xl rounded-full animate-pulse-slow"></div>
-      <div className="absolute bottom-20 right-20 w-80 h-80 bg-emerald-200/30 blur-3xl rounded-full animate-pulse-slower"></div>
-      <div className="absolute top-1/2 left-1/3 w-40 h-40 bg-amber-100/30 blur-2xl rounded-full animate-softPulse"></div>
+    <div className="relative min-h-screen overflow-hidden bg-[#fbfaf6] font-[Outfit] text-slate-800">
 
       {/* 🧠 Hero Section */}
-      <section className="flex flex-col lg:flex-row items-center justify-center gap-12 px-8 md:px-16 py-28 mt-16 relative z-10">
-        <div className="flex-1 space-y-6 animate-fadeInUp">
-          <h1 className="text-5xl md:text-6xl font-[Playfair_Display] font-extrabold leading-tight text-gray-800">
-            A Place Where <br />
-            <span className="bg-clip-text text-transparent bg-linear-to-r from-teal-500 to-emerald-400">
-              Healing Meets Technology
+      <section className="relative isolate overflow-hidden bg-gradient-to-br from-[#eff8f2] via-[#f9f8f1] to-[#f7ecdd] px-6 pb-16 pt-36 sm:px-10 sm:pb-20 sm:pt-40 lg:px-16 lg:pb-24">
+        <div className="pointer-events-none absolute -right-20 top-20 size-80 rounded-full bg-[#d6eee0]/60 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-32 left-1/3 size-96 rounded-full bg-[#fae8c9]/45 blur-3xl" aria-hidden="true" />
+        <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center gap-10 lg:flex-row lg:gap-16">
+        <div className="flex-1 space-y-6 text-center lg:text-left">
+          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-teal-100 bg-white/70 px-3 py-1.5 text-xs font-semibold tracking-wide text-teal-800 shadow-sm lg:mx-0">
+            <Leaf size={14} /> A little more room to breathe
+          </div>
+          <h1 className="text-4xl font-[Playfair_Display] font-bold leading-tight text-[#233f37] sm:text-5xl md:text-6xl">
+            A place where <br className="hidden sm:block" />
+            <span className="text-teal-700">
+              care meets technology
             </span>
           </h1>
-          <p className="text-gray-700 text-lg leading-relaxed max-w-xl font-[Outfit]">
-            MindHaven is your serene digital retreat for emotional wellness —
-            blending compassion, community, and cutting-edge AI to create a
-            comforting experience that helps you heal, reflect, and grow.
+          <p className="mx-auto max-w-xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8 lg:mx-0">
+            MindHaven brings mindful tools, supportive community, and thoughtful technology together in one gentle space for reflection and growth.
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 bg-linear-to-r from-teal-400 to-emerald-500 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 hover:brightness-110 transition-all duration-300"
+            className="inline-flex items-center gap-2 rounded-full bg-[#237c68] px-6 py-3 font-semibold text-white shadow-[0_10px_24px_rgba(35,124,104,0.2)] transition hover:-translate-y-0.5 hover:bg-[#1d6b5b] hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-800"
           >
-            <Sparkles size={20} className="animate-spin-slow" /> Get Started
+            <Sparkles size={18} /> Find your space <ArrowRight size={16} />
           </Link>
         </div>
 
         {/* Hero Image */}
-        <div className="flex-1 flex justify-center relative">
-          <div className="absolute -inset-6 bg-linear-to-r from-teal-100 to-emerald-100 blur-3xl rounded-full opacity-50"></div>
+        <div className="relative flex flex-1 justify-center">
+          <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-teal-100/80 via-white/50 to-amber-100/70 blur-2xl" aria-hidden="true" />
           <Image
             src={About}
             alt="Mindfulness and healing concept"
             width={480}
             height={480}
-            className="rounded-4xl shadow-2xl object-cover border border-white/60 relative z-10 hover:scale-105 transition-transform duration-700"
+            className="relative z-10 aspect-square w-full max-w-[28rem] rounded-[2rem] border-8 border-white/75 object-cover shadow-[0_24px_70px_rgba(46,83,66,0.16)] transition-transform duration-500 hover:-rotate-1 hover:scale-[1.02]"
           />
+        </div>
         </div>
       </section>
 
       {/* 🌸 Creative Story Section */}
-      <section className="relative py-36 px-6 md:px-20 bg-linear-to-b from-[#E9FDF4] via-[#F8FFFB] to-[#FFF9F4] overflow-hidden">
-        {/* Floating glows */}
-        <div className="absolute top-16 left-24 w-60 h-60 bg-emerald-100/40 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-0 right-32 w-72 h-72 bg-teal-200/30 rounded-full blur-3xl animate-pulse-slower"></div>
-
-        {/* Curved top divider */}
-        <div className="absolute top-0 left-0 w-full h-32 bg-linear-to-b from-transparent to-white rounded-b-[50%]"></div>
-
-        <div className="max-w-6xl mx-auto text-center relative z-10 space-y-10">
-          <h2 className="text-5xl md:text-6xl font-[Playfair_Display] font-extrabold text-gray-800">
+      <section className="relative overflow-hidden bg-[#fbfaf6] px-6 py-20 sm:px-10 sm:py-24 lg:px-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">Why MindHaven began</p>
+          <h2 className="mt-3 text-4xl font-[Playfair_Display] font-bold text-[#233f37] sm:text-5xl">
             Our{" "}
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-500 to-teal-400">
+            <span className="text-teal-700">
               Story
             </span>
           </h2>
 
-          <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-700 leading-relaxed font-[Outfit]">
-            What started as a small spark of compassion has blossomed into a
-            mindful movement — where <strong>technology listens</strong>,
-            <strong> empathy guides</strong>, and <strong>healing feels human</strong>.
+          <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+            A simple idea guides us: <strong className="font-semibold text-slate-800">technology can feel more human</strong> when empathy leads the way.
           </p>
+          </div>
 
-          {/* 🌼 Floating Glass Story Card */}
-          <div className="relative mt-16 flex flex-col lg:flex-row items-center gap-10">
-            <div className="flex-1 relative">
-              <div className="absolute -inset-6 bg-linear-to-tr from-teal-100 to-emerald-100 blur-3xl rounded-3xl opacity-70"></div>
+          <div className="relative mt-12 grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+            <div className="relative mx-auto w-full max-w-xl">
+              <div className="absolute -inset-3 rounded-[2.25rem] bg-gradient-to-br from-teal-100 to-amber-100 opacity-70 blur-xl" aria-hidden="true" />
               <Image
                 src={Story}
                 alt="Our journey illustration"
                 width={500}
                 height={500}
-                className="rounded-4xl shadow-2xl object-cover relative z-10 border border-white/60 hover:scale-[1.03] transition-transform duration-700"
+                className="relative z-10 aspect-[4/3] w-full rounded-[1.75rem] border-8 border-white/80 object-cover shadow-[0_20px_55px_rgba(46,83,66,0.12)] transition-transform duration-500 hover:scale-[1.015]"
               />
             </div>
 
-            {/* ✨ Floating Glass Text Box */}
-            <div className="flex-1 backdrop-blur-xl bg-white/70 border border-teal-100 shadow-2xl rounded-3xl p-10 space-y-6 hover:shadow-emerald-100/40 transition-all duration-500">
-              <p className="text-lg md:text-xl text-gray-700 font-[Outfit] leading-relaxed">
-                MindHaven was born from a simple belief — that mental wellness
-                shouldn’t feel clinical. It should feel <em>warm</em>,
-                <em>personal</em>, and <em>alive</em>.  
+            <div className="rounded-[1.75rem] border border-[#e7eee7] bg-white/85 p-6 shadow-[0_14px_38px_rgba(46,83,66,0.07)] sm:p-9">
+              <div className="flex size-11 items-center justify-center rounded-2xl bg-[#eaf5ee] text-teal-800">
+                <Heart size={20} />
+              </div>
+              <p className="mt-5 text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">
+                MindHaven was born from a simple belief: emotional wellness should feel <em className="text-teal-800">warm</em>, <em className="text-teal-800">personal</em>, and welcoming.
               </p>
 
-              <blockquote className="italic text-2xl text-teal-600 font-[Playfair_Display] leading-relaxed">
+              <blockquote className="mt-5 border-l-2 border-teal-300 pl-4 font-[Playfair_Display] text-xl italic leading-relaxed text-teal-800 sm:text-2xl">
                 “Technology can heal when guided by empathy.”
               </blockquote>
 
-              <p className="text-lg md:text-xl text-gray-700 font-[Outfit]">
-                We don’t just build tools — we craft calm. Our goal is to be the
-                space you turn to when you need to breathe, reflect, and find
-                peace.
+              <p className="mt-5 text-sm leading-7 text-slate-600 sm:text-base">
+                We bring reflection, connection, and mindful practices together so you can find the tools that feel right for you—at your own pace.
               </p>
 
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 bg-linear-to-r from-emerald-400 to-teal-500 text-white px-8 py-3 rounded-full font-semibold shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300"
+                className="mt-6 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-5 py-2.5 text-sm font-semibold text-teal-900 transition hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-800"
               >
-                <Sparkles size={18} className="animate-pulse" /> Join the Journey
+                Join the journey <ArrowRight size={15} />
               </Link>
             </div>
           </div>
@@ -124,19 +118,17 @@ export default function AboutPage() {
       </section>
 
       {/* 🌿 Our Core Values Section */} 
-      <section className="relative py-32 px-8 md:px-16 bg-linear-to-br from-[#E8F9FF] via-[#F8FFFB] to-[#FFF8F1] text-center overflow-hidden">
-        {/* Animated floating glows */}
-        <div className="absolute top-20 left-1/3 w-64 h-64 bg-teal-200/30 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-16 right-1/4 w-80 h-80 bg-emerald-100/40 rounded-full blur-3xl animate-pulse-slower"></div>
-
-        <h2 className="text-5xl md:text-6xl font-[Playfair_Display] font-extrabold text-gray-800 mb-20 relative z-10">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#eef7f1] via-[#f7f8f2] to-[#f8f0e5] px-6 py-20 text-center sm:px-10 sm:py-24 lg:px-16">
+        <div className="relative z-10 mx-auto max-w-6xl">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">What guides us</p>
+        <h2 className="mt-3 font-[Playfair_Display] text-4xl font-bold text-[#233f37] sm:text-5xl">
           Our{" "}
-          <span className="text-transparent bg-clip-text bg-linear-to-r from-teal-500 to-emerald-400">
+          <span className="text-teal-700">
             Core Values
           </span>
         </h2>
 
-        <div className="flex flex-wrap justify-center gap-14 max-w-6xl mx-auto relative z-10">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               title: "Empathy First",
@@ -165,82 +157,69 @@ export default function AboutPage() {
           ].map((value, i) => (
             <div
               key={i}
-              className="group relative w-60 h-60 bg-linear-to-br hover:shadow-2xl transition-all duration-700 rounded-full p-0.5 hover:scale-110"
-              style={{
-                backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))`,
-              }}
+              className="group relative overflow-hidden rounded-[1.5rem] border border-white/80 bg-white/80 p-6 text-left shadow-[0_8px_24px_rgba(46,83,66,0.06)] transition duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_16px_34px_rgba(46,83,66,0.1)]"
             >
-              {/* 3D Card Glow Layer */}
               <div
-                className={`absolute inset-0 rounded-full bg-linear-to-br ${value.color} blur-xl opacity-70 group-hover:opacity-90 transition-all`}
-              ></div>
-
-              {/* Card Inner */}
-              <div className="absolute inset-0.5 rounded-full bg-white/90 backdrop-blur-md flex flex-col items-center justify-center text-center shadow-lg transition-all duration-500 group-hover:-translate-y-2 group-hover:rotate-[4deg]">
-                <div className="mb-3 transform group-hover:scale-110 transition-transform">
+                className={`absolute -right-8 -top-8 size-24 rounded-full bg-gradient-to-br ${value.color} opacity-60 blur-2xl transition-opacity group-hover:opacity-90`}
+                aria-hidden="true"
+              />
+              <div className="relative">
+                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl border border-white bg-white/90 shadow-sm transition-transform group-hover:-rotate-3 group-hover:scale-105">
                   {value.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800">
+                <h3 className="text-lg font-semibold text-slate-800">
                   {value.title}
                 </h3>
-                <p className="text-sm text-gray-600 px-5 mt-2 leading-snug">
+                <p className="mt-2 text-sm leading-6 text-slate-600">
                   {value.desc}
                 </p>
-
-                {/* Ambient Light Glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-12 bg-linear-to-r from-white/50 to-transparent rounded-full blur-lg opacity-70 animate-pulse"></div>
               </div>
             </div>
           ))}
         </div>
-
-        {/* Floating background icons for depth */}
-        <div className="absolute inset-0 opacity-10">
-          <Heart className="absolute top-10 left-10 w-20 h-20 text-pink-400 animate-float-slow" />
-          <Shield className="absolute bottom-20 right-20 w-16 h-16 text-teal-400 animate-float-slower" />
-          <Brain className="absolute top-1/2 right-10 w-14 h-14 text-indigo-300 animate-float-slow" />
         </div>
       </section>
       {/* 👨‍💻 Founder Section */}{" "}
-      <section className="py-32 px-8 md:px-16 bg-linear-to-br from-[#F8FFFB] to-[#E8F9FF] text-center relative">
-        {" "}
-        <h2 className="text-4xl md:text-5xl font-[Playfair_Display] font-extrabold text-gray-800 mb-6">
+      <section className="relative bg-[#fbfaf6] px-6 py-20 text-center sm:px-10 sm:py-24 lg:px-16">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">The person behind the idea</p>
+        <h2 className="mt-3 mb-8 font-[Playfair_Display] text-4xl font-bold text-[#233f37] sm:text-5xl">
           {" "}
-          Meet the <span className="text-teal-500 italic">Founder</span>{" "}
+          Meet the <span className="text-teal-700 italic">Founder</span>{" "}
         </h2>{" "}
-        <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-12 mt-12 bg-white/70 p-10 rounded-3xl shadow-2xl backdrop-blur-md border border-white/50">
+        <div className="mx-auto mt-10 flex max-w-5xl flex-col items-center justify-center gap-8 rounded-[1.75rem] border border-[#e7eee7] bg-white/85 p-6 text-left shadow-[0_14px_38px_rgba(46,83,66,0.07)] sm:p-9 lg:flex-row lg:gap-12">
           {" "}
           <Image
             src={Harshit}
             alt="Harshit Aggarwal"
             width={380}
             height={380}
-            className="rounded-3xl object-cover shadow-xl border-4 border-teal-200 hover:scale-105 transition-transform duration-500"
+            className="aspect-square w-full max-w-[19rem] rounded-[1.5rem] border-8 border-[#f1f7f1] object-cover shadow-lg transition-transform duration-500 hover:scale-[1.02]"
           />{" "}
           <div className="text-left space-y-5">
             {" "}
-            <h3 className="text-3xl font-bold text-gray-900 font-[Playfair_Display]">
+            <h3 className="text-2xl font-bold text-[#233f37] font-[Playfair_Display] sm:text-3xl">
               {" "}
               Harshit Aggarwal{" "}
             </h3>{" "}
-            <p className="text-gray-700 text-lg leading-relaxed">
+            <p className="text-base leading-7 text-slate-600 sm:text-lg">
               {" "}
               The visionary behind <strong>MindHaven</strong>, Harshit is
               committed to fusing technology and empathy to make emotional care
               accessible for all. His mission is to empower people to heal
               freely and live mindfully.{" "}
             </p>{" "}
-            <blockquote className="border-l-4 border-teal-400 pl-4 italic text-gray-700 text-lg">
+            <blockquote className="border-l-2 border-teal-300 pl-4 font-[Playfair_Display] text-lg italic leading-relaxed text-teal-800 sm:text-xl">
               {" "}
               “Healing doesn’t need to be clinical — it needs to be kind.”{" "}
             </blockquote>{" "}
             {/* 🌐 Social Links */}{" "}
-            <div className="flex space-x-6 mt-6">
+            <div className="mt-6 flex gap-3">
               {" "}
               <Link
                 href="mailto:harshitagg2003@gmail.com"
                 target="_blank"
-                className="text-teal-600 hover:text-emerald-500 transition"
+                aria-label="Email Harshit"
+                className="rounded-full bg-teal-50 p-3 text-teal-800 transition hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-800"
               >
                 {" "}
                 <Mail size={26} />{" "}
@@ -248,7 +227,8 @@ export default function AboutPage() {
               <Link
                 href="https://linkedin.com/in/harshit-aggarwal-8727b4227"
                 target="_blank"
-                className="text-teal-600 hover:text-emerald-500 transition"
+                aria-label="Harshit on LinkedIn"
+                className="rounded-full bg-teal-50 p-3 text-teal-800 transition hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-800"
               >
                 {" "}
                 <Linkedin size={26} />{" "}
@@ -256,7 +236,8 @@ export default function AboutPage() {
               <Link
                 href="https://instagram.com/harshit_agg_"
                 target="_blank"
-                className="text-teal-600 hover:text-emerald-500 transition"
+                aria-label="Harshit on Instagram"
+                className="rounded-full bg-teal-50 p-3 text-teal-800 transition hover:bg-teal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-800"
               >
                 {" "}
                 <Instagram size={26} />{" "}

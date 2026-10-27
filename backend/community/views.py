@@ -1,7 +1,8 @@
 from datetime import timedelta
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, IntegerField, OuterRef, Prefetch, Q, Subquery, Value
+from django.db.models.functions import Coalesce, TruncDate
 from django.utils import timezone
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -22,6 +23,7 @@ from .models import (
     PostComment,
     PostReaction,
     Report,
+    UserPresence,
 )
 from .permissions import IsAuthenticatedAndMember, IsCommunityModerator
 from .serializers import (
@@ -45,6 +47,56 @@ from .utils import COMMUNITIES
 User = get_user_model()
 
 
+def with_community_counts(queryset):
+    active_member_counts = (
+        CommunityMembership.objects.filter(
+            community_id=OuterRef("pk"),
+            is_active=True,
+        )
+        .order_by()
+        .values("community_id")
+        .annotate(count=Count("pk"))
+        .values("count")
+    )
+    post_counts = (
+        CommunityPost.objects.filter(
+            community_id=OuterRef("pk"),
+            is_deleted=False,
+        )
+        .order_by()
+        .values("community_id")
+        .annotate(count=Count("pk"))
+        .values("count")
+    )
+    online_counts = (
+        UserPresence.objects.filter(
+            room__community_id=OuterRef("pk"),
+            room__is_private=False,
+            is_online=True,
+            user__community_memberships__community_id=OuterRef("pk"),
+            user__community_memberships__is_active=True,
+        )
+        .order_by()
+        .values("room__community_id")
+        .annotate(count=Count("user_id", distinct=True))
+        .values("count")
+    )
+    return queryset.annotate(
+        active_member_count=Coalesce(
+            Subquery(active_member_counts, output_field=IntegerField()),
+            Value(0),
+        ),
+        post_count=Coalesce(
+            Subquery(post_counts, output_field=IntegerField()),
+            Value(0),
+        ),
+        online_count=Coalesce(
+            Subquery(online_counts, output_field=IntegerField()),
+            Value(0),
+        ),
+    )
+
+
 class CommunityListView(generics.ListAPIView):
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
@@ -52,10 +104,7 @@ class CommunityListView(generics.ListAPIView):
 
     def get_queryset(self):
         query = self.request.query_params.get("q", "").strip()
-        queryset = Community.objects.annotate(
-            active_member_count=Count("memberships", filter=Q(memberships__is_active=True), distinct=True),
-            post_count=Count("posts", filter=Q(posts__is_deleted=False), distinct=True),
-        )
+        queryset = with_community_counts(Community.objects.all())
         if query:
             queryset = queryset.filter(Q(name__icontains=query) | Q(description__icontains=query))
         return queryset
@@ -66,7 +115,12 @@ class CommunityMembershipView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return CommunityMembership.objects.filter(user=self.request.user, is_active=True).select_related("community")
+        return CommunityMembership.objects.filter(
+            user=self.request.user,
+            is_active=True,
+        ).prefetch_related(
+            Prefetch("community", queryset=with_community_counts(Community.objects.all()))
+        )
 
     def create(self, request, *args, **kwargs):
         community_id = request.data.get("community_id")
@@ -95,6 +149,33 @@ class CommunityMembershipView(generics.ListCreateAPIView):
             )
         serializer = self.get_serializer(membership)
         return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
+class CommunityChatActivityView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        activity = (
+            ChatMessage.objects.filter(
+                author=request.user,
+                is_deleted=False,
+                room__is_private=False,
+            )
+            .order_by()
+            .annotate(day=TruncDate("created_at"))
+            .values("room__community_id", "room__community__name", "day")
+            .annotate(message_count=Count("id"))
+            .order_by("-day", "room__community__name")[:100]
+        )
+        return Response([
+            {
+                "id": f"{row['room__community_id']}-{row['day'].isoformat()}",
+                "community_name": row["room__community__name"],
+                "date": row["day"].isoformat(),
+                "message_count": row["message_count"],
+            }
+            for row in activity
+        ])
 
 
 class CommunityChatRoomView(APIView):
@@ -128,14 +209,18 @@ class CommunityChatRoomView(APIView):
             "community": membership.community.name,
             "display_anonymously": membership.display_anonymously,
             "display_name": display_name,
+            "online_count": UserPresence.objects.filter(
+                room__community=membership.community,
+                room__is_private=False,
+                is_online=True,
+                user__community_memberships__community=membership.community,
+                user__community_memberships__is_active=True,
+            ).values("user_id").distinct().count(),
         })
 
 
 class CommunityDetailView(generics.RetrieveAPIView):
-    queryset = Community.objects.annotate(
-        active_member_count=Count("memberships", filter=Q(memberships__is_active=True), distinct=True),
-        post_count=Count("posts", filter=Q(posts__is_deleted=False), distinct=True),
-    )
+    queryset = with_community_counts(Community.objects.all())
     serializer_class = CommunitySerializer
     lookup_field = "slug"
     permission_classes = [permissions.IsAuthenticated]
@@ -384,10 +469,7 @@ class CommunityLandingView(generics.RetrieveAPIView):
     serializer_class = CommunitySerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = "slug"
-    queryset = Community.objects.annotate(
-        active_member_count=Count("memberships", filter=Q(memberships__is_active=True), distinct=True),
-        post_count=Count("posts", filter=Q(posts__is_deleted=False), distinct=True),
-    )
+    queryset = with_community_counts(Community.objects.all())
 
     def get(self, request, *args, **kwargs):
         community = self.get_object()
@@ -406,5 +488,11 @@ class CommunityLandingView(generics.RetrieveAPIView):
             "pinned_posts": CommunityPostSerializer(pinned_posts, many=True).data,
             "trending_posts": CommunityPostSerializer(trending_posts, many=True).data,
             "moderators": [m.user.anonymous_identity.handle for m in moderators],
-            "online_count": ChatParticipant.objects.filter(room__community=community, is_active=True).values("user").distinct().count(),
+            "online_count": UserPresence.objects.filter(
+                room__community=community,
+                room__is_private=False,
+                is_online=True,
+                user__community_memberships__community=community,
+                user__community_memberships__is_active=True,
+            ).values("user_id").distinct().count(),
         })

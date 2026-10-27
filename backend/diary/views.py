@@ -45,7 +45,7 @@ def decode_jwt_token(token):
     return None
 
 
-def get_authenticated_user(request):
+def get_authenticated_user(request, *, check_credentials=True):
     user_model = get_user_model()
 
     email = request.headers.get("X-Diary-Email") or request.data.get("email") if hasattr(request, "data") else None
@@ -53,7 +53,7 @@ def get_authenticated_user(request):
 
     if email and password:
         user = user_model.objects.filter(email=email).first()
-        if user and user.check_password(password):
+        if user and (not check_credentials or user.check_password(password)):
             return user
 
     auth_header = ""
@@ -145,13 +145,21 @@ def list_diary_entries(request):
     if not user:
         return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
     query = request.GET.get("q", "").strip()
-    entries = DiaryEntry.objects.filter(user=user, deleted=False)
+    entries = DiaryEntry.objects.filter(user=user, deleted=False).only(
+        "id",
+        "title",
+        "content",
+        "favorite",
+        "created_at",
+        "updated_at",
+    )
     if query:
         entries = entries.filter(title__icontains=query)
     entries = entries.order_by("-created_at")
 
     data = []
     for entry in entries:
+        entry_word_count = word_count(entry.content)
         data.append({
             "id": entry.id,
             "title": entry.title,
@@ -159,8 +167,8 @@ def list_diary_entries(request):
             "favorite": entry.favorite,
             "created_at": entry.created_at.isoformat(),
             "updated_at": entry.updated_at.isoformat(),
-            "word_count": word_count(entry.content),
-            "reading_time_minutes": reading_time_minutes(entry.content),
+            "word_count": entry_word_count,
+            "reading_time_minutes": max(1, round(entry_word_count / 200)),
         })
     return Response(data)
 
@@ -169,14 +177,16 @@ def list_diary_entries(request):
 @authentication_classes([])
 @permission_classes([AllowAny])
 def verify_diary_access(request):
-    user = get_authenticated_user(request)
+    user = get_authenticated_user(request, check_credentials=False)
     if not user:
         return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
     serializer = VerifyDiaryAccessSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    verified_user = get_user_model().objects.filter(email=serializer.validated_data["email"]).first()
-    if not verified_user or not verified_user.check_password(serializer.validated_data["password"]) or verified_user != user:
+    if (
+        user.email != serializer.validated_data["email"]
+        or not user.check_password(serializer.validated_data["password"])
+    ):
         return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
     return Response({"verified": True})

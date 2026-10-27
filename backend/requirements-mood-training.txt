@@ -1,0 +1,6 @@
+# Optional evaluation and fine-tuning dependencies for the public-data workflow.
+# Install a suitable PyTorch build separately for the chosen CPU/GPU environment.
+accelerate>=1,<2
+datasets>=3,<5
+scikit-learn>=1.4,<2
+transformers>=4.50,<5

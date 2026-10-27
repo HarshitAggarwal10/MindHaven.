@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+@media (prefers-reduced-motion: reduce) {
+  .mood-motion *,
+  .mood-motion *::before,
+  .mood-motion *::after {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes auth-gentle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes auth-gentle-sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+.auth-float {
+  animation: auth-gentle-float 5s ease-in-out infinite;
+}
+
+.auth-sway {
+  animation: auth-gentle-sway 4.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-float,
+  .auth-sway {
+    animation: none !important;
+  }
+}

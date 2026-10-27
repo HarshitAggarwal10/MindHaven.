@@ -26,14 +26,22 @@ export default function DashboardPage() {
     fetchUser();
   }, []);
 
+  useEffect(() => {
+    const handleSectionChange = (event) => {
+      if (typeof event.detail === "string") setSelected(event.detail);
+    };
+    window.addEventListener("switch-section", handleSectionChange);
+    return () => window.removeEventListener("switch-section", handleSectionChange);
+  }, []);
+
   return (
-    <div className="h-screen bg-[#F1F8F8] flex overflow-hidden">
+    <div className="flex h-dvh min-h-[600px] overflow-hidden bg-[#eef4f3]">
       <Sidebar selected={selected} onSelect={setSelected} />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <Topbar user={user} />
 
-        <div className="p-6 overflow-auto flex-1">
+        <div className="flex-1 overflow-auto p-3 sm:p-5 lg:p-6">
           <ContentSwitcher selected={selected} />
         </div>
       </div>

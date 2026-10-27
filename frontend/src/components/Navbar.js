@@ -42,72 +42,73 @@ export default function Navbar() {
     router.push("/login");
   };
 
-  return (
-    <div className="fixed top-6 left-1/2 -translate-x-1/2 w-[92%] md:w-[80%] max-w-6xl z-50">
-      <nav className="flex justify-between items-center rounded-2xl bg-white/30 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.07)] px-6 md:px-10 py-3 border border-white/40 transition-all duration-300">
+  const navLinkClass = (href) =>
+    `rounded-full px-3 py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 ${
+      pathname === href
+        ? "bg-teal-50/90 text-teal-800"
+        : "text-slate-600 hover:bg-white/70 hover:text-teal-800"
+    }`;
 
-        {/* LOGO */}
-        <Link href="/" className="text-2xl md:text-3xl font-bold text-teal-600 hover:text-teal-700">
-          MindHaven<span className="text-teal-400">.</span>
+  return (
+    <div className="fixed left-1/2 top-3 z-50 w-[calc(100%-1.25rem)] max-w-6xl -translate-x-1/2 sm:top-5 sm:w-[calc(100%-2.5rem)]">
+      <nav className="relative flex items-center justify-between gap-2 rounded-[1.35rem] border border-white/75 bg-white/65 px-3 py-2.5 shadow-[0_12px_42px_rgba(31,67,58,0.12)] backdrop-blur-2xl backdrop-saturate-150 sm:gap-4 sm:px-5 sm:py-3 md:px-6">
+        <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-r from-white/25 via-transparent to-teal-50/30" aria-hidden="true" />
+        <Link
+          href="/"
+          className="relative z-10 shrink-0 rounded-lg text-xl font-bold tracking-tight text-[#246b5e] transition hover:text-teal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-700 sm:text-2xl"
+        >
+          MindHaven<span className="text-amber-500">.</span>
         </Link>
 
-        {/* DESKTOP MENU */}
-        <div className="hidden md:flex items-center space-x-8 font-medium text-sm">
+        <div className="relative z-10 hidden items-center gap-1 rounded-full border border-white/65 bg-white/35 p-1 text-[13px] font-semibold lg:flex">
+          <Link href="/about" className={navLinkClass("/about")}>About</Link>
+          <button onClick={() => router.push("/#faq")} className={navLinkClass("/faq")}>FAQ</button>
+          <button onClick={() => router.push("/#reviews")} className={navLinkClass("/reviews")}>Reviews</button>
+          <Link href="/contact" className={navLinkClass("/contact")}>Contact</Link>
 
-          <Link href="/about" className="text-gray-700 hover:text-teal-600">About</Link>
-          <button onClick={() => router.push("/#faq")} className="text-gray-700 hover:text-teal-600">FAQ</button>
-          <button onClick={() => router.push("/#reviews")} className="text-gray-700 hover:text-teal-600">Reviews</button>
-          <Link href="/contact" className="text-gray-700 hover:text-teal-600">Contact</Link>
-
-          {/* DASHBOARD Button (only if logged in) */}
           {user && (
             <Link
               href="/dashboard"
-              className="text-gray-700 hover:text-teal-600 font-semibold transition"
+              className="rounded-full px-3 py-2 text-slate-600 transition hover:bg-white/70 hover:text-teal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
             >
               Dashboard
             </Link>
           )}
         </div>
 
-        {/* RIGHT SECTION */}
-        <div className="flex items-center space-x-4">
-
-          {/* USER DROPDOWN */}
+        <div className="relative z-10 flex shrink-0 items-center gap-2 sm:gap-3">
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setOpen(!open)}
-                className="flex items-center gap-3 px-3 py-1 rounded-full hover:shadow-md transition"
+                aria-expanded={open}
+                aria-haspopup="menu"
+                className="flex items-center gap-2 rounded-full border border-white/70 bg-white/40 p-1 pr-2 transition hover:bg-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 sm:gap-3 sm:py-1 sm:pl-2"
               >
-                {/* Avatar */}
-                <div className="w-9 h-9 rounded-full bg-teal-500 text-white flex items-center justify-center font-semibold">
+                <div className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-teal-600 to-emerald-500 text-xs font-bold text-white shadow-sm sm:size-9">
                   {user.name
                     ? user.name.split(" ").map((x) => x[0]).join("").slice(0, 2)
                     : (user.email || "U")[0].toUpperCase()}
                 </div>
-
-                {/* User info */}
-                <div className="hidden md:block text-left">
-                  <div className="text-sm font-medium text-gray-800">{user.name || user.email}</div>
-                  <div className="text-xs text-gray-500">Member</div>
+                <div className="hidden text-left md:block">
+                  <div className="max-w-28 truncate text-xs font-semibold text-slate-800">{user.name || user.email}</div>
+                  <div className="text-[10px] text-slate-500">MindHaven member</div>
                 </div>
               </button>
 
-              {/* DROPDOWN MENU */}
               {open && (
-                <div className="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl border py-2 z-50">
-                  <Link href="/profile" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
+                <div role="menu" className="absolute right-0 mt-3 w-52 overflow-hidden rounded-2xl border border-white/80 bg-white/90 py-2 shadow-[0_16px_45px_rgba(31,67,58,0.17)] backdrop-blur-2xl">
+                  <Link role="menuitem" href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-teal-50">
                     <UserIcon size={16} /> Profile
                   </Link>
 
-                  <Link href="/settings" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
+                  <Link role="menuitem" href="/settings" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-teal-50">
                     <Settings size={16} /> Settings
                   </Link>
 
                   <button
                     onClick={logout}
-                    className="w-full text-left flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-red-600"
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-rose-600 transition hover:bg-rose-50"
                   >
                     <LogOut size={16} /> Logout
                   </button>
@@ -115,50 +116,53 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            /* GET STARTED BUTTON */
             <button
               onClick={() => router.push("/login")}
-              className="
-                relative px-5 py-2 rounded-full font-semibold text-white
-                bg-linear-to-r from-teal-400 to-teal-600 shadow-lg
-                hover:shadow-xl hover:scale-105 transition-all duration-300"
+              className="hidden rounded-full bg-[#267b69] px-4 py-2.5 text-xs font-semibold text-white shadow-[0_7px_18px_rgba(38,123,105,0.22)] transition hover:-translate-y-0.5 hover:bg-[#1d6b5b] hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 sm:inline-flex sm:px-5 sm:text-sm"
             >
-              <span className="relative z-10">Get Started</span>
-              <span className="absolute inset-0 bg-white/10 blur-xl opacity-60"></span>
+              Get started
             </button>
           )}
 
-          {/* MOBILE HAMBURGER */}
           <button
-            className="md:hidden text-gray-700"
+            className="inline-flex size-10 items-center justify-center rounded-full border border-white/70 bg-white/45 text-slate-700 transition hover:bg-white/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 lg:hidden"
             onClick={() => setMobileMenu(!mobileMenu)}
+            aria-label={mobileMenu ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileMenu}
+            aria-controls="public-mobile-menu"
           >
-            {mobileMenu ? <X size={26} /> : <Menu size={26} />}
+            {mobileMenu ? <X size={21} /> : <Menu size={21} />}
           </button>
         </div>
       </nav>
 
-      {/* ===================== MOBILE MENU ===================== */}
       {mobileMenu && (
-        <div className="md:hidden mt-3 bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg p-5 space-y-4 text-center">
-
-          <Link href="/about" className="block text-gray-700 hover:text-teal-600">About</Link>
-          <button onClick={() => router.push("/#faq")} className="block text-gray-700 hover:text-teal-600">FAQ</button>
-          <button onClick={() => router.push("/#reviews")} className="block text-gray-700 hover:text-teal-600">Reviews</button>
-          <Link href="/contact" className="block text-gray-700 hover:text-teal-600">Contact</Link>
+        <div id="public-mobile-menu" className="mt-2 grid gap-1 rounded-[1.35rem] border border-white/75 bg-white/85 p-2 shadow-[0_16px_45px_rgba(31,67,58,0.15)] backdrop-blur-2xl lg:hidden">
+          <Link href="/about" onClick={() => setMobileMenu(false)} className={`${navLinkClass("/about")} text-left`}>About</Link>
+          <button onClick={() => { setMobileMenu(false); router.push("/#faq"); }} className={`${navLinkClass("/faq")} text-left`}>FAQ</button>
+          <button onClick={() => { setMobileMenu(false); router.push("/#reviews"); }} className={`${navLinkClass("/reviews")} text-left`}>Reviews</button>
+          <Link href="/contact" onClick={() => setMobileMenu(false)} className={`${navLinkClass("/contact")} text-left`}>Contact</Link>
 
           {user && (
-            <Link href="/dashboard" className="block text-gray-700 hover:text-teal-600 font-semibold">
+            <Link href="/dashboard" onClick={() => setMobileMenu(false)} className="rounded-full px-3 py-2 text-left font-semibold text-slate-600 transition hover:bg-white/70 hover:text-teal-800">
               Dashboard
             </Link>
           )}
 
-          {!user && (
+          {!user ? (
             <button
-              onClick={() => router.push("/login")}
-              className="w-full py-2 rounded-xl bg-linear-to-r from-teal-400 to-teal-600 text-white font-semibold shadow-md"
+              onClick={() => { setMobileMenu(false); router.push("/login"); }}
+              className="mt-1 w-full rounded-xl bg-[#267b69] py-3 font-semibold text-white shadow-sm transition hover:bg-[#1d6b5b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 sm:hidden"
             >
-              Get Started
+              Get started
+            </button>
+          ) : null}
+          {user && (
+            <button
+              onClick={logout}
+              className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium text-rose-600 transition hover:bg-rose-50 sm:hidden"
+            >
+              <LogOut size={16} /> Sign out
             </button>
           )}
         </div>

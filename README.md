@@ -60,7 +60,7 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Create `backend/.env` (do not commit it) with development-specific values:
+Copy `backend/.env.example` to `backend/.env` (do not commit it), then set development-specific values:
 
 ```dotenv
 SECRET_KEY=replace-with-a-long-random-django-secret
@@ -185,6 +185,76 @@ npm run lint
 npm run build
 npm start
 ```
+
+## Private mood check-ins and AI analysis
+
+The dashboard's Mood Tracker supports private, self-reported check-ins, saved history, and statistics. Manual check-ins do not use or send diary text. AI analysis is optional and processes only text a signed-in user enters in the mood panel and explicitly consents to analyze. Saved diary entries are not loaded, decrypted, or transmitted by this feature.
+
+### Local CPU inference (default)
+
+The default provider is `local-transformers`, using the public `j-hartmann/emotion-english-distilroberta-base` model. The seven output labels are anger, disgust, fear, joy, neutral, sadness, and surprise. Inference runs on the Django server CPU; submitted text is not sent to Hugging Face or another inference provider. The server may download the public model files from Hugging Face the first time the model is used, but the submitted text is not part of that download. Model files take several hundred MB, and the model consumes server memory and CPU while loading and analyzing text.
+
+Install the optional packages in the activated backend virtual environment. On Windows or Linux, install the CPU-only PyTorch wheel first so the optional local model does not pull a CUDA build:
+
+```powershell
+cd backend
+python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r requirements-mood-local.txt
+```
+
+On macOS, install the optional requirements with `python -m pip install -r requirements-mood-local.txt`; PyTorch provides a CPU build for macOS. Copy `backend/.env.example` to `backend/.env` if you have not already, then use the defaults or set:
+
+```dotenv
+MOOD_AI_PROVIDER=local-transformers
+MOOD_AI_MODEL_ID=j-hartmann/emotion-english-distilroberta-base
+MOOD_AI_LOCAL_FILES_ONLY=false
+MOOD_AI_LOCAL_NUM_THREADS=2
+```
+
+Restart Django after installing packages or changing environment variables. The first analysis requires network access to fetch public model files and can take longer than later requests; subsequent requests use the cached model. Set `MOOD_AI_LOCAL_CACHE_DIR` to choose a cache location. For an offline server, first download/cache the model while online, then set `MOOD_AI_LOCAL_FILES_ONLY=true`; analysis will fail clearly if the model is not already cached. Keep server CPU and memory limits in mind when deploying. The optional CPU packages are separate from the standard backend requirements.
+
+If the local packages are absent, the configuration endpoint and dashboard explain how to install them. Analysis remains disabled instead of returning a fabricated prediction. The local model-loading and inference errors are surfaced without logging submitted text.
+
+### Hosted inference (optional)
+
+If you prefer hosted inference, Django can call Hugging Face Inference Providers; the browser never receives the provider token. Hosted service availability and billing are controlled by Hugging Face and the selected provider. Review Hugging Face's current [security and privacy information](https://huggingface.co/docs/inference-providers/security), [model availability](https://huggingface.co/models?inference=warm&pipeline_tag=text-classification), [API format](https://huggingface.co/docs/inference-providers/tasks/text-classification), and [billing](https://huggingface.co/docs/inference-providers/pricing). Set these variables privately in `backend/.env`:
+
+```dotenv
+MOOD_AI_PROVIDER=hf-inference
+MOOD_AI_MODEL_ID=j-hartmann/emotion-english-distilroberta-base
+MOOD_AI_MODEL_VERSION=
+HUGGINGFACE_API_TOKEN=your-server-side-inference-token
+MOOD_AI_TIMEOUT_SECONDS=15
+```
+
+Never use a `NEXT_PUBLIC_` variable for this credential. Restart Django after changing its environment. `MOOD_AI_TIMEOUT_SECONDS` must be between 1 and 60. Check the dashboard's mood panel to confirm the configured provider is available before testing with a short, non-sensitive sample.
+
+Verify that any replacement model returns all seven expected emotion labels. Scores are classifier outputs, not medical probabilities, diagnosis, or certainty about a person's feelings.
+
+### Data, consent, and endpoints
+
+- The frontend submits only the text typed into the AI reflection form after the user checks an explicit consent box. It does not fetch a diary entry or run background analysis. With the default local provider, Django analyzes the text on its CPU and does not send it to an inference provider. With hosted inference selected, Django sends it to Hugging Face over TLS. In both modes, Django keeps the source text in request memory only and does not write it to analysis rows or application logs. Production proxies and observability tools should also be configured not to capture request bodies.
+- Hugging Face currently states that routed Inference Providers requests and responses are not stored for training or stored as request/response bodies, and debugging logs may be kept for up to 30 days. A selected underlying provider may have separate terms; the user must review the current provider policies before sharing sensitive content. Avoid names and identifying or crisis-related information.
+- The database stores the authenticated Django user, self-reported mood or derived model labels/scores, brief generated text, model identifier/version, status, and timestamp. It does not store AI input text and does not link analyses to diary entries. Analyses are private to their owner and can be deleted from history. Check-ins can be edited or deleted; deleting/altering a diary entry has no effect because no diary relationship exists.
+- The API uses the existing Django JWT authentication. Endpoints are `GET /api/mood/config/`, `POST|GET /api/mood/check-ins/`, `PATCH|DELETE /api/mood/check-ins/<uuid>/`, `POST /api/mood/analyze/`, `GET|DELETE /api/mood/analyses/<uuid>/`, `GET /api/mood/history/?days=7|30|90&limit=50`, and `GET /api/mood/stats/?days=7|30`. Analysis requests require `text` (20–3,000 characters) and `consent: true`; an optional UUID `idempotency_key` prevents duplicate records on a retried request. Analysis is throttled to 10 requests/hour per signed-in user, and check-ins to 60/hour.
+- Results can be unclear. The interface describes the result as a prediction, shows the actual returned score distribution, and invites a manual check-in when the model is uncertain. Suggestions are optional, deterministic, and non-clinical. MindHaven's general emotion classifier is not a crisis or suicide-risk detector and is not medical care.
+
+### Database migration and checks
+
+The mood migration only adds its own check-in and analysis tables and indexes; it does not alter diary tables or stored diary content. For an existing deployment, back up the database, review the pending migration list, and then apply it from `backend/`:
+
+```bash
+python manage.py showmigrations mood
+python manage.py migrate mood
+python manage.py check
+python manage.py test mood
+```
+
+Also run the existing backend suite (`python manage.py test`) and frontend checks (`npm run lint`, `npm run build`) before deployment. Automated provider tests mock inference. A successful mock test does not verify package installation, model download/cache availability, server resources, hosted credentials, billing, or live response compatibility.
+
+### Optional public-data model evaluation and training
+
+An isolated, opt-in evaluation and fine-tuning workflow using a public dataset is documented in [docs/MOOD_MODEL_TRAINING.md](docs/MOOD_MODEL_TRAINING.md). It is not part of web application startup, does not access MindHaven users' private check-ins or diary entries, and does not change the production model. Treat exported weights as experimental until independently reviewed and evaluated.
 
 `npm start` serves the production build, so run `npm run build` first.
 

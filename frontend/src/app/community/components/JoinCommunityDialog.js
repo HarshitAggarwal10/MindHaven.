@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, HeartHandshake, LockKeyhole, ShieldAlert, UserRound } from "lucide-react";
 import CommunityIcon from "./CommunityIcon";
 
-export default function JoinCommunityDialog({ community, open, onClose, onJoin, joining = false }) {
+export default function JoinCommunityDialog({ community, open, onClose, onJoin, joining = false, joinError = "" }) {
   const [step, setStep] = useState("consent");
   const [displayAnonymously, setDisplayAnonymously] = useState(true);
+  const [respectAgreement, setRespectAgreement] = useState(false);
 
   if (!open || !community) return null;
 
@@ -59,9 +61,18 @@ export default function JoinCommunityDialog({ community, open, onClose, onJoin, 
               <ShieldAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
               <span>If you or someone else is in immediate danger, contact local emergency services or a trusted crisis-support service. This community is not monitored as an emergency service.</span>
             </div>
+            <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-2xl border border-teal-100 bg-teal-50/60 p-4 text-sm leading-6 text-slate-700 transition-colors hover:bg-teal-50">
+              <input
+                checked={respectAgreement}
+                className="mt-1 size-4 accent-teal-700"
+                onChange={(event) => setRespectAgreement(event.target.checked)}
+                type="checkbox"
+              />
+              <span>I agree to be respectful, protect other members&apos; privacy, and share support without judgment.</span>
+            </label>
             <div className="mt-7 flex justify-end gap-3">
               <button className="rounded-full px-5 py-3 font-semibold text-slate-600 transition-colors hover:bg-slate-100" onClick={onClose} type="button">Not now</button>
-              <button className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-3 font-semibold text-white shadow-md transition duration-300 hover:-translate-y-0.5 hover:shadow-lg" onClick={() => setStep("identity")} type="button">
+              <button className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-3 font-semibold text-white shadow-md transition duration-300 hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50" disabled={!respectAgreement} onClick={() => setStep("identity")} type="button">
                 I understand
                 <ArrowRight className="transition-transform group-hover:translate-x-0.5" size={17} />
               </button>
@@ -90,9 +101,17 @@ export default function JoinCommunityDialog({ community, open, onClose, onJoin, 
                 </span>
               </label>
             </div>
+            {joinError && (
+              <p className="mt-4 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-800" role="alert">
+                {joinError}
+                {joinError.includes("sign in again") && (
+                  <Link className="ml-1 font-bold underline underline-offset-2" href="/login">Sign in</Link>
+                )}
+              </p>
+            )}
             <div className="mt-7 flex justify-between gap-3">
               <button className="inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold text-slate-600 transition-colors hover:bg-slate-100" disabled={joining} onClick={() => setStep("consent")} type="button"><ArrowLeft size={17} /> Back</button>
-              <button className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-3 font-semibold text-white shadow-md transition duration-300 hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-wait disabled:opacity-60" disabled={joining} onClick={() => onJoin(displayAnonymously)} type="button">
+              <button aria-busy={joining} className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-500 to-emerald-600 px-5 py-3 font-semibold text-white shadow-md transition duration-300 hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-wait disabled:opacity-60" disabled={joining} onClick={() => onJoin(displayAnonymously)} type="button">
                 {joining ? "Joining..." : "Join community"}
                 {!joining && <Check size={17} />}
               </button>

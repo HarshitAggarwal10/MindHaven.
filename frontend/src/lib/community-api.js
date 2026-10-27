@@ -15,7 +15,15 @@ async function request(path, options = {}) {
   });
   const data = response.status === 204 ? null : await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(data?.detail || data?.error || "The community request could not be completed.");
+    if (response.status === 401 && typeof window !== "undefined") {
+      localStorage.removeItem("mh_token");
+    }
+    const message = response.status === 401
+      ? "Your sign-in session is invalid or expired. Please sign in again."
+      : data?.detail || data?.error || "The community request could not be completed.";
+    const error = new Error(message);
+    error.status = response.status;
+    throw error;
   }
   return data;
 }
@@ -42,6 +50,10 @@ export function leaveCommunity(slug) {
 
 export function getUserMemberships() {
   return request("/membership/");
+}
+
+export function getCommunityChatActivity() {
+  return request("/chat-activity/");
 }
 
 export function getCommunityPosts(communitySlug, sort = "newest") {

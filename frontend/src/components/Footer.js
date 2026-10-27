@@ -1,130 +1,87 @@
-"use client";
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, Send } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Send, Sparkles } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-linear-to-t from-[#F7FDF9] via-[#FFF8EF] to-[#FAFDFB] text-gray-700 px-8 md:px-20 py-20 overflow-hidden">
-      {/* 🌸 Soft Floating Orbs for Serenity */}
-      <div className="absolute top-10 left-10 w-40 h-40 bg-teal-200/30 rounded-full blur-3xl animate-softPulse"></div>
-      <div className="absolute bottom-10 right-10 w-60 h-60 bg-emerald-200/30 rounded-full blur-3xl animate-softPulse"></div>
+    <footer className="relative overflow-hidden bg-gradient-to-br from-[#eef5ef] via-[#f7f7f0] to-[#f7eee2] px-5 pb-6 pt-14 text-slate-700 sm:px-8 sm:pt-16 lg:px-12">
+      <div className="pointer-events-none absolute -right-20 -top-32 size-96 rounded-full bg-teal-100/55 blur-3xl" aria-hidden="true" />
+      <div className="pointer-events-none absolute -bottom-40 left-1/4 size-96 rounded-full bg-amber-100/50 blur-3xl" aria-hidden="true" />
 
-      <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-12">
-        {/* MindHaven Brand Column */}
-        <div>
-          <h3 className="text-2xl font-extrabold text-teal-600 mb-4">
-            MindHaven
-          </h3>
-          <p className="text-gray-600 text-sm leading-relaxed mb-5">
-            Your safe space for emotional healing and personal growth. Find
-            comfort, connection, and calm — all in one mindful place.
-          </p>
-          <Link
-            href="/about_us"
-            className="text-teal-500 hover:text-emerald-600 text-sm font-medium transition-colors"
-          >
-            Learn more about us →
-          </Link>
-        </div>
-
-        {/* Explore */}
-        <FooterColumn
-          title="Explore"
-          items={[
-            "About MindHaven",
-            "Community Support",
-            "Mindfulness Tools",
-            "Therapist Sessions",
-          ]}
-        />
-
-        {/* Resources */}
-        <FooterColumn
-          title="Resources"
-          items={[
-            "Mental Health Articles",
-            "Self-Care Guides",
-            "Anxiety & Stress Tips",
-            "Personal Growth Plans",
-          ]}
-        />
-
-        {/* Support */}
-        <FooterColumn
-          title="Support"
-          items={["FAQs", "Contact Us", "Privacy Policy", "Terms & Conditions"]}
-        />
-
-        {/* Newsletter */}
-        <div className="flex flex-col items-start md:items-center">
-          <h3 className="text-xl font-bold mb-4 text-gray-800">Stay Mindful</h3>
-          <p className="text-gray-600 mb-5 text-sm leading-relaxed max-w-xs md:max-w-sm text-center md:text-left">
-            Join our mindful circle to receive calming reflections, self-growth
-            reminders, and wellness updates every week.
-          </p>
-
-          {/* 💌 Newsletter Subscribe Box */}
-          <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-full shadow-md border border-teal-200 transition-all duration-300 px-4 py-2 mb-4">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="w-full px-3 py-2 text-sm bg-transparent outline-none placeholder-gray-400 text-gray-700 rounded-full"
-            />
+      <div className="relative mx-auto max-w-6xl">
+        <div className="grid gap-10 rounded-[2rem] border border-white/80 bg-white/55 p-6 shadow-[0_14px_45px_rgba(47,76,62,0.07)] backdrop-blur-xl sm:p-9 lg:grid-cols-[1.25fr_0.75fr_0.8fr_1.2fr] lg:gap-8 lg:p-10">
+          <div>
+            <Link href="/" className="inline-flex items-center gap-2 rounded-lg text-2xl font-bold tracking-tight text-[#246b5e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-700">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-teal-100/80 text-teal-800"><Sparkles size={18} /></span>
+              MindHaven<span className="text-amber-500">.</span>
+            </Link>
+            <p className="mt-4 max-w-xs text-sm leading-6 text-slate-600">
+              Your safe space for emotional healing and personal growth. Find comfort, connection, and calm—all in one mindful place.
+            </p>
+            <Link
+              href="/about"
+              className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-teal-800 transition hover:gap-2 hover:text-teal-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-700"
+            >
+              Learn about us <span aria-hidden="true">→</span>
+            </Link>
           </div>
 
-          {/* Subscribe Button */}
-          <button className="relative flex items-center justify-center gap-2 bg-linear-to-r from-teal-400 to-emerald-500 text-white px-8 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-            <Send
-              size={16}
-              className="transition-transform group-hover:translate-x-1"
-            />
-            <span className="text-sm font-semibold">Subscribe</span>
-          </button>
+          <FooterColumn
+            title="Explore"
+            items={["About MindHaven", "Community Support", "Mindfulness Tools", "Therapist Sessions"]}
+          />
+          <FooterColumn
+            title="Resources"
+            items={["Mental Health Articles", "Self-Care Guides", "Anxiety & Stress Tips", "Personal Growth Plans"]}
+          />
+
+          <div>
+            <h3 className="text-base font-semibold text-slate-800">Stay mindful</h3>
+            <p className="mt-2 max-w-sm text-sm leading-6 text-slate-600">
+              Join our mindful circle for calming reflections, self-growth reminders, and wellness updates.
+            </p>
+            <div className="mt-4 flex w-full max-w-sm items-center gap-2 rounded-full border border-white/90 bg-white/85 p-1.5 shadow-sm transition focus-within:border-teal-300 focus-within:ring-4 focus-within:ring-teal-500/10">
+              <input
+                type="email"
+                aria-label="Email address for mindful updates"
+                placeholder="Your email address"
+                className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400"
+              />
+              <button
+                type="button"
+                aria-label="Subscribe to mindful updates"
+                className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#267b69] text-white shadow-sm transition hover:bg-[#1d6b5b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
+              >
+                <Send size={16} />
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-slate-500">A little calm, delivered gently.</p>
+          </div>
         </div>
-      </div>
 
-      {/* Divider */}
-      <div className="border-t border-gray-200 my-12"></div>
-
-      {/* Footer Bottom */}
-      <div className="relative z-10 flex flex-col md:flex-row justify-between items-center text-sm">
-        <p className="text-gray-500">
-          © 2024 <span className="font-semibold text-teal-500">MindHaven</span>.
-          Nurturing mental well-being with compassion and connection.
-        </p>
-
-        <div className="flex space-x-6 mt-4 md:mt-0">
-          <SocialLink
-            icon={<Facebook size={20} />}
-            href="https://facebook.com/"
-          />
-          <SocialLink
-            icon={<Instagram size={20} />}
-            href="https://instagram.com/"
-          />
-          <SocialLink
-            icon={<Linkedin size={20} />}
-            href="https://linkedin.com/"
-          />
+        <div className="mt-8 flex flex-col gap-5 border-t border-teal-900/10 px-1 pt-5 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <p className="max-w-2xl text-xs leading-5 text-slate-500 sm:text-sm">
+            © {new Date().getFullYear()} <span className="font-semibold text-teal-800">MindHaven</span>. Nurturing mental well-being with compassion and connection.
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="mr-1 text-xs font-medium text-slate-500">Find us</span>
+            <SocialLink icon={<Facebook size={17} />} href="https://facebook.com/" label="MindHaven on Facebook" />
+            <SocialLink icon={<Instagram size={17} />} href="https://instagram.com/" label="MindHaven on Instagram" />
+            <SocialLink icon={<Linkedin size={17} />} href="https://linkedin.com/" label="MindHaven on LinkedIn" />
+          </div>
         </div>
       </div>
     </footer>
   );
 }
 
-/* --- Footer Column Component --- */
 function FooterColumn({ title, items }) {
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4 text-gray-800">{title}</h3>
-      <ul className="space-y-2">
-        {items.map((item, i) => (
-          <li
-            key={i}
-            className="text-gray-600 hover:text-teal-600 transition-colors duration-200 cursor-pointer text-sm flex items-center space-x-2 group"
-          >
-            <span className="w-1.5 h-1.5 bg-teal-400 rounded-full group-hover:scale-125 transition-transform"></span>
-            <span>{item}</span>
+      <h3 className="text-base font-semibold text-slate-800">{title}</h3>
+      <ul className="mt-3 space-y-2.5">
+        {items.map((item) => (
+          <li key={item} className="text-sm text-slate-600 transition hover:text-teal-800">
+            {item}
           </li>
         ))}
       </ul>
@@ -132,13 +89,14 @@ function FooterColumn({ title, items }) {
   );
 }
 
-/* --- Social Icons Component --- */
-function SocialLink({ icon, href }) {
+function SocialLink({ icon, href, label }) {
   return (
     <Link
       href={href}
       target="_blank"
-      className="text-gray-500 hover:text-teal-500 transition transform hover:scale-110"
+      rel="noreferrer"
+      aria-label={label}
+      className="flex size-9 items-center justify-center rounded-full border border-white/90 bg-white/70 text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:text-teal-800 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
     >
       {icon}
     </Link>

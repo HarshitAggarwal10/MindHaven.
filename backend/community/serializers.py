@@ -34,11 +34,12 @@ class AnonymousIdentitySerializer(serializers.ModelSerializer):
 class CommunitySerializer(serializers.ModelSerializer):
     member_count = serializers.SerializerMethodField()
     post_count = serializers.IntegerField(read_only=True)
+    online_count = serializers.IntegerField(read_only=True)
     is_public = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Community
-        fields = ["id", "slug", "name", "description", "member_count", "post_count", "is_public"]
+        fields = ["id", "slug", "name", "description", "member_count", "post_count", "online_count", "is_public"]
 
     def get_member_count(self, obj):
         annotated_count = getattr(obj, "active_member_count", None)
@@ -221,9 +222,13 @@ class PrivateSupportRequestSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    anonymous_identity = AnonymousIdentitySerializer()
+    anonymous_identity = serializers.SerializerMethodField()
     memberships = CommunityMembershipSerializer(many=True)
 
     class Meta:
         model = User
-        fields = ["id", "anonymous_identity", "memberships"]
+        fields = ["id", "display_name", "anonymous_identity", "memberships"]
+
+    def get_anonymous_identity(self, obj):
+        identity = getattr(obj, "anonymous_identity", None)
+        return AnonymousIdentitySerializer(identity).data if identity else None

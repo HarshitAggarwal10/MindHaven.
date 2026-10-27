@@ -4,9 +4,9 @@ from datetime import timedelta
 from corsheaders.defaults import default_headers # type: ignore
 from dotenv import load_dotenv  # type: ignore
 
-load_dotenv()  # loads .env
-
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
+
 FIREBASE_CREDENTIALS_JSON = os.path.join(BASE_DIR, "firebase_service_account.json")
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     "users",
     "diary",
     "community",
+    "mood",
+    "wellness",
 ]
 
 SIMPLE_JWT = {
@@ -42,7 +44,35 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_THROTTLE_RATES": {
+        "mood_analysis": "10/hour",
+        "mood_checkin": "60/hour",
+        "wellness_booking": "10/hour",
+        "wellness_booking_read": "120/hour",
+        "wellness_review": "5/hour",
+        "wellness_payment_verification": "20/hour",
+        "wellness_cancellation": "10/hour",
+    },
 }
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+MOOD_AI_PROVIDER = os.getenv("MOOD_AI_PROVIDER", "local-transformers")
+MOOD_AI_MODEL_ID = os.getenv(
+    "MOOD_AI_MODEL_ID", "j-hartmann/emotion-english-distilroberta-base"
+)
+MOOD_AI_MODEL_VERSION = os.getenv("MOOD_AI_MODEL_VERSION", "")
+HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACE_API_TOKEN", "")
+MOOD_AI_TIMEOUT_SECONDS = os.getenv("MOOD_AI_TIMEOUT_SECONDS", "15")
+MOOD_AI_LOCAL_FILES_ONLY = (
+    os.getenv("MOOD_AI_LOCAL_FILES_ONLY", "false").lower() == "true"
+)
+MOOD_AI_LOCAL_CACHE_DIR = os.getenv("MOOD_AI_LOCAL_CACHE_DIR", "")
+MOOD_AI_LOCAL_NUM_THREADS = os.getenv("MOOD_AI_LOCAL_NUM_THREADS", "2")
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
+RAZORPAY_WEBHOOK_SECRET = os.getenv("RAZORPAY_WEBHOOK_SECRET", "")
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

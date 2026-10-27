@@ -84,7 +84,7 @@ export default function ContentSwitcher({ selected }) {
             shadow-[0_10px_40px_rgba(0,0,0,0.10)]
             border border-white/50
             rounded-3xl 
-            p-8 
+            p-4 sm:p-6 lg:p-8
             overflow-y-auto 
             beautiful-scrollbar
           "

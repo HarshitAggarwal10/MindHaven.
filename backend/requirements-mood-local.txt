@@ -1,0 +1,4 @@
+# Optional, CPU-only local inference for the mood feature.
+# Install after the standard backend requirements in the active virtual environment.
+torch>=2.6,<3
+transformers>=4.50,<5
